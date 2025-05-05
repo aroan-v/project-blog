@@ -4,20 +4,26 @@ import BlogSummaryCard from '@/components/BlogSummaryCard';
 
 import styles from './homepage.module.css';
 
-function Home() {
+import { getBlogPostList } from '@/helpers/file-helpers';
+import Spinner from '@/components/Spinner';
+
+async function Home() {
+  const blogPostList = await getBlogPostList();
   return (
     <div className={styles.wrapper}>
-      <h1 className={styles.mainHeading}>
-        Latest Content:
-      </h1>
-
-      {/* TODO: Iterate over the data read from the file system! */}
-      <BlogSummaryCard
-        slug="example"
-        title="Hello world!"
-        abstract="This is a placeholder, an example which shows how the “BlogSummaryCard” component should be used. You'll want to swap this out based on the data from the various MDX files!"
-        publishedOn={new Date()}
-      />
+      <h1 className={styles.mainHeading}>Latest Content:</h1>
+      {blogPostList.map(({ slug, title, abstract, publishedOn }) => {
+        return (
+          <React.Suspense key={publishedOn} fallback={<Spinner />}>
+            <BlogSummaryCard
+              slug={slug}
+              title={title}
+              abstract={abstract}
+              publishedOn={publishedOn}
+            />
+          </React.Suspense>
+        );
+      })}
     </div>
   );
 }
